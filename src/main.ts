@@ -4,8 +4,11 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggerService } from './logger.service'; // Import LoggerService
 import { ConfigService } from '@nestjs/config';
+import { initializeTransactionalContext } from 'typeorm-transactional';
 
 async function bootstrap() {
+  initializeTransactionalContext();
+
   const app = await NestFactory.create(AppModule);
   const logger = app.get(LoggerService); // Retrieve LoggerService instance
   const configService = app.get(ConfigService);
@@ -23,13 +26,13 @@ async function bootstrap() {
     logger.log('Microservice running at: '+new Date().toString());
   });
   const options = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('Live_server')
+    .setDescription('The live API description')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('docs', app, document);
 
   await app.listen(port).then(() => {
     logger.log('Application running at: '+new Date().toString());

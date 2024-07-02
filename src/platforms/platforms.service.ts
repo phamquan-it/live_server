@@ -1,26 +1,48 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePlatformDto } from './dto/create-platform.dto';
 import { UpdatePlatformDto } from './dto/update-platform.dto';
+import { Platform } from './entities/platform.entity';
+import { Like, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class PlatformsService {
-  create(createPlatformDto: CreatePlatformDto) {
-    return 'This action adds a new platform';
+  constructor(
+    @InjectRepository(Platform)
+    private platformRepository: Repository<Platform>,
+  ) {}
+  async create(createPlatformDto: CreatePlatformDto, icon: Express.Multer.File): Promise<Platform> {
+    createPlatformDto.icon = icon.path;
+    const platform = this.platformRepository.create(createPlatformDto);
+
+    return this.platformRepository.save(platform);
   }
 
-  findAll() {
-    return `This action returns all platforms`;
+  async findAll(datafilter:any): Promise<any> {
+   
+    const data = await this.platformRepository.findAndCount({
+      skip:!isNaN(datafilter.offset)? datafilter.offset: 0,
+      take:!isNaN(datafilter.limit)? datafilter.limit: 0,
+      where: {name: Like(`%${datafilter.search??''}%`)}
+    })
+    return {
+      data: data[0],
+      total: data[1]
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} platform`;
+  async findOne(id: number) {
+    return await this.platformRepository.findOne({ 
+      where: {id: id},
+      relations: ['categories']
+     });
   }
 
   update(id: number, updatePlatformDto: UpdatePlatformDto) {
     return `This action updates a #${id} platform`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} platform`;
+  async remove(id: number) {
+    return await this.platformRepository.delete(id)
   }
 }

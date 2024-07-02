@@ -15,6 +15,17 @@ import { OrderStatusModule } from './order_status/order_status.module';
 import { PlatformsModule } from './platforms/platforms.module';
 import { CategoryModule } from './category/category.module';
 import { ServiceModule } from './service/service.module';
+import { VpsModule } from './vps/vps.module';
+import { MemoryVpsModule } from './memory_vps/memory_vps.module';
+import { LinksModule } from './links/links.module';
+import { LogOrderModule } from './log_order/log_order.module';
+import { PaymentModule } from './payment/payment.module';
+import { DiscountModule } from './discount/discount.module';
+import { FundController } from './fund/fund.controller';
+import { BankController } from './bank/bank.controller';
+import { PaymentOptionController } from './payment_option/payment_option.controller';
+import { LogController } from './log/log.controller';
+import { ProviderController } from './provider/provider.controller';
 
 @Module({
   imports: [
@@ -23,7 +34,9 @@ import { ServiceModule } from './service/service.module';
       envFilePath: '.env',
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: 'D:\\live_server\\uploads',
+     // rootPath: join(__dirname, '..', 'uploads'), // Path to your static files
+      serveRoot: '/images', // The URL path to serve static files from
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -36,10 +49,11 @@ import { ServiceModule } from './service/service.module';
         database: configService.get('DBNAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
+        timezone:  "+07:00"
       }),
       inject: [ConfigService],
     }),
-    UsersModule,
+    
     AuthModule,
     RolesModule,
     UserStatusModule,
@@ -47,9 +61,16 @@ import { ServiceModule } from './service/service.module';
     OrderStatusModule,
     PlatformsModule,
     CategoryModule,
-    ServiceModule
+    ServiceModule,
+    VpsModule,
+    MemoryVpsModule,
+    LinksModule,
+    LogOrderModule,
+    PaymentModule,
+    UsersModule,
+    DiscountModule
   ],
-  controllers: [AppController],
+  controllers: [AppController, FundController, BankController, PaymentOptionController, LogController, ProviderController],
   providers: [AppService, LoggerService],
 })
 export class AppModule {}
