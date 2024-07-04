@@ -17,9 +17,10 @@ async function bootstrap() {
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,
-    options: { 
-      host:'localhost',
-      retryAttempts: 5, retryDelay: 3001 },
+    options: {
+      host: '192.168.1.37',
+      port: 3301,
+    },
   });
 
   await app.startAllMicroservices().then(() => {
